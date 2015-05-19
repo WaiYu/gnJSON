@@ -15,6 +15,7 @@ import xml.dom.minidom
 # Set DEBUG to True if you want this module to print out the query and response XML
 DEBUG = False
 
+
 def register(clientID):
   """
   This function registers an application as a user of the Gracenote service
@@ -40,6 +41,7 @@ def register(clientID):
   # POST query
   response = urllib2.urlopen(_gnurl(clientID), queryXML)
   return xml.dom.minidom.parse(response)
+
 
 def search(clientID='', userID='', artist='', album='', track='', toc=''):
   """
@@ -94,6 +96,14 @@ def search(clientID='', userID='', artist='', album='', track='', toc=''):
     print responseXML
   
   return xml.dom.minidom.parse(response)
+
+
+def _gnurl(clientID):
+  """
+  Helper function to form URL to Gracenote service
+  """
+  clientIDprefix = clientID.split('-')[0]
+  return 'https://c' + clientIDprefix + '.web.cddbp.net/webapi/xml/1.0/'
 
 class _gnquery:
   """
@@ -205,3 +215,89 @@ class _gnquery:
     radio = xml.etree.ElementTree.SubElement(query, 'RADIO')
     myradioid = xml.etree.ElementTree.SubElement(radio, 'ID')
     myradioid.text = radioID
+
+
+def getNodeList(elem):
+  childNodes = elem.childNodes
+  nodeList = {}
+  for node in childNodes:
+    if '#text' not in node.nodeName:
+      nodeNameSTR = str(node.nodeName)
+      if nodeNameSTR in nodeList.keys():
+        nodeList[nodeNameSTR] += 1
+      else:
+        nodeList[nodeNameSTR] = 1
+  return nodeList
+
+
+def getTagAttribute(elem):
+  attriJSON = {}
+  attriList = elem.attributes.keys()
+  if len(attriList):
+    for attName in attriList:
+      attriJSON[attName] = elem.getAttribute(attName)
+  
+  return attriJSON
+
+
+def getNodeContent(elem):
+  content = {}
+  
+  # TODO: check back if this added part to check error query is causing problem
+  if elem.getAttribute('STATUS') == 'ERROR':
+    content['MESSAGE'] = elem.parentNode.getElementsByTagName("MESSAGE")[0].firstChild.nodeValue
+    content['STATUS'] = 'ERROR'
+    return content
+  
+  if len(elem.childNodes) == 1:
+    # end node, get value
+    content[elem.nodeName.encode('utf-8')] = elem.childNodes[0].nodeValue.encode('utf-8')
+    # add attributes, if any
+    elemAttributes = getTagAttribute(elem)
+    if elemAttributes:
+      for k, v in elemAttributes.items():
+        content[k.encode('utf-8')] = v.encode('utf-8')
+    
+  else:
+    childNodeList = getNodeList(elem)
+    # modify node list to use for counting/sequencing nodes with same name
+    for k in childNodeList.keys():
+      if childNodeList[k] == 1: childNodeList.pop(k)
+      else: childNodeList[k] = 0
+    
+    # go through each child node and get node content
+    childElem = elem.firstChild
+    childContent = {}
+    while childElem:
+      tempContent = {}
+      if '#text' not in childElem.nodeName:
+        tempContent = getNodeContent(childElem)
+        if childElem.nodeName in childNodeList.keys():
+          # handle nodes with same name
+          tempMultiTag = {}
+          childNodeList[childElem.nodeName] += 1
+          
+          if childElem.nodeName.encode('utf-8') in childContent.keys(): tempMultiTag = childContent[childElem.nodeName.encode('utf-8')]
+          
+          if type(tempContent[childElem.nodeName.encode('utf-8')]) is type({}):
+            tempMultiTag[str(childNodeList[childElem.nodeName])] = tempContent[childElem.nodeName.encode('utf-8')]
+          else:
+            tempMultiTag[str(childNodeList[childElem.nodeName])] = tempContent
+          
+          #tempMultiTag[str(childNodeList[childElem.nodeName])] = tempContent
+          childContent[childElem.nodeName.encode('utf-8')] = tempMultiTag
+        else:
+          if len(tempContent) > 1:
+            childContent[childElem.nodeName.encode('utf-8')] = tempContent
+          else:
+            childContent[childElem.nodeName.encode('utf-8')] = tempContent[childElem.nodeName.encode('utf-8')]
+      childElem = childElem.nextSibling
+    # add attributes, if any
+    elemAttributes =getTagAttribute(elem)
+    if elemAttributes:
+      for k, v in elemAttributes.items():
+        childContent[k.encode('utf-8')] = v.encode('utf-8')
+    
+    content[elem.nodeName.encode('utf-8')] = childContent
+  
+  return content
