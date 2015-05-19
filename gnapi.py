@@ -28,14 +28,14 @@ def convertInputArgsToJSON(args):
     input_JSON[key.lower()] = request.args.get(key)
   return input_JSON
 
-def checkInput(api="", input_JSON={}):
+def checkRequiredParam(api="", input_JSON={}):
   # check if user provide correct input parameters 
   requiredParam = []
   # FOR DEVELOPMENT USE
   if api == "/search":
     requiredParam = ['artist', 'gender', 'fake_third_param']
     if not set(requiredParam) & set(input_JSON.keys()):
-      return "<pre>You need to provide at least one of the three search text - artist, artist title or track title</pre>"
+      return ["bad","You need to provide at least one of the three search text - artist, artist title or track title"]
     
   elif api == "/album_search":
     requiredParam = ['artist', 'artist_title', 'track_title']
@@ -66,11 +66,16 @@ def checkInput(api="", input_JSON={}):
   
   return ["good"]
 
-def createHTML(response):
-  resultPage = open('templates/test.html', 'w')
-  resultPage.write('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><head><title>Interactive Rhythm API Console</title></head><body><pre>' + response + '</pre></body></html>')
-  resultPage.close()
-  return "A HTML page to display returned JSON"
+def checkInput(request):
+  auth_Check_Result = checkAuth(request.args)
+  if auth_Check_Result[0] == "bad":
+    return auth_Check_Result
+  
+  input_JSON = convertInputArgsToJSON(request.args)
+  input_Check_Result = checkRequiredParam((request.path), input_JSON)
+  if input_Check_Result[0] == "bad":
+    return input_Check_Result
+  return ["good", input_JSON]
 
 @app.route("/")
 def hello():
@@ -105,15 +110,22 @@ def sample():
 
 @app.route("/search")
 def dev():
+  check_Result = checkInput(request)
+  if check_Result[0] == "bad":
+    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+  else:
+    return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+  """
   auth_Check_Result = checkAuth(request.args)
   if auth_Check_Result[0] == "bad":
     return "<pre>" + json.dumps(auth_Check_Result[1], separators=(',', ': ')) + "</pre>"
   
   input_JSON = convertInputArgsToJSON(request.args)
-  input_Check_Result = checkInput((request.path), input_JSON)
+  input_Check_Result = checkRequiredParam((request.path), input_JSON)
   if input_Check_Result[0] == "bad":
     return "<pre>" + json.dumps(input_Check_Result[1], separators=(',', ': ')) + "</pre>"
   return "<pre>" + request.path + " API<br>" + json.dumps(input_JSON, sort_keys=True, separators=(',', ': ')) + "</pre>"
+  """
   
   """
   # get metadata by calling getNodeContent function
@@ -131,35 +143,35 @@ def dev():
 
 @app.route("/album_search")
 def albumSearch():
-  if request.args:
-    response = "ALBUM_SEARCH with input(s)<br>" + str(request.args)
+  check_Result = checkInput(request)
+  if check_Result[0] == "bad":
+    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
   else:
-    response = "ALBUM_SEARCH"
-  return response
+    return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
 
 @app.route("/album_fingerprint")
 def albumFingerprint():
-  if request.args:
-    response = "ALBUM_FINGERPRINT with input(s)<br>" + str(request.args)
+  check_Result = checkInput(request)
+  if check_Result[0] == "bad":
+    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
   else:
-    response = "ALBUM_FINGERPRINT"
-  return response
+    return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
 
 @app.route("/album_toc")
 def albumToc():
-  if request.args:
-    response = "ALBUM_TOC with input(s)<br>" + str(request.args)
+  check_Result = checkInput(request)
+  if check_Result[0] == "bad":
+    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
   else:
-    response = "ALBUM_TOC"
-  return response
+    return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
 
 @app.route("/album_fetch")
 def albumFetch():
-  if request.args:
-    response = "ALBUM_FETCH with input(s)<br>" + str(request.args)
+  check_Result = checkInput(request)
+  if check_Result[0] == "bad":
+    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
   else:
-    response = "ALBUM_FETCH"
-  return response
+    return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
 
 if __name__ == "__main__":
   app.debug = True
