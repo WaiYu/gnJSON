@@ -1,12 +1,12 @@
 """
-pygn.py
+pygn2.py
 
-pygn (pronounced "pigeon") is a simple Python client for the Gracenote Music 
-Web API, which can retrieve Artist, Album and Track metadata with the most 
-common options.
+Implemented functions from pygn (pronounced "pigeon"), a simple Python client 
+for the Gracenote Music Web API created by cweichen, which can retrieve Artist, 
+Album and Track metadata with the most common options. With XML formatting 
+functions to help parse XML response to JSON format.
 
-You will need a Gracenote Client ID to use this module. Please contact 
-developers@gracenote.com to get one.
+This is a tool module for Python web application gnapi.py
 """
 
 import xml.etree.ElementTree, urllib2, urllib, json
@@ -104,6 +104,7 @@ def _gnurl(clientID):
   """
   clientIDprefix = clientID.split('-')[0]
   return 'https://c' + clientIDprefix + '.web.cddbp.net/webapi/xml/1.0/'
+
 
 class _gnquery:
   """
@@ -216,7 +217,8 @@ class _gnquery:
     myradioid = xml.etree.ElementTree.SubElement(radio, 'ID')
     myradioid.text = radioID
 
-
+#---------------------------------------------------------------------------------------------------
+# Query XML response formatting functions 
 def getNodeList(elem):
   childNodes = elem.childNodes
   nodeList = {}
