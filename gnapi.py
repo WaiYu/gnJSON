@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import request, render_template
 import json
-from pygn2 import register, search, getNodeContent
+from pygn2 import register, search, fetch, getNodeContent
 app = Flask(__name__)
 
 def checkAuth(args):
@@ -38,7 +38,7 @@ def checkRequiredParam(api="", input_JSON={}):
       return ["bad","You need to provide at least one of the three search text - artist, artist title or track title"]
     
   elif api == "/album_search":
-    requiredParam = ['artist', 'artist_title', 'track_title']
+    requiredParam = ['artist', 'album_title', 'track_title']
     if not set(requiredParam) & set(input_JSON.keys()):
       return ["bad", {"RESPONSE":"Missing query string", "MESSAGE":"Please provide at least one of the three search field - artist, artist title or track title"}]
   
@@ -64,7 +64,7 @@ def checkRequiredParam(api="", input_JSON={}):
     if param not in input_JSON.keys():
       input_JSON[param] = ""
   
-  return ["good"]
+  return ["good", input_JSON]
 
 def checkInput(request):
   auth_Check_Result = checkAuth(request.args)
@@ -75,11 +75,11 @@ def checkInput(request):
   input_Check_Result = checkRequiredParam((request.path), input_JSON)
   if input_Check_Result[0] == "bad":
     return input_Check_Result
-  return ["good", input_JSON]
+  return input_Check_Result
 
 @app.route("/")
 def hello():
-  return "Hello World!"
+  return "This is the Gracenote WebAPI wrapper"
 
 @app.route("/register")
 def registerUser():
@@ -115,39 +115,20 @@ def dev():
     return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
   else:
     return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
-  """
-  auth_Check_Result = checkAuth(request.args)
-  if auth_Check_Result[0] == "bad":
-    return "<pre>" + json.dumps(auth_Check_Result[1], separators=(',', ': ')) + "</pre>"
-  
-  input_JSON = convertInputArgsToJSON(request.args)
-  input_Check_Result = checkRequiredParam((request.path), input_JSON)
-  if input_Check_Result[0] == "bad":
-    return "<pre>" + json.dumps(input_Check_Result[1], separators=(',', ': ')) + "</pre>"
-  return "<pre>" + request.path + " API<br>" + json.dumps(input_JSON, sort_keys=True, separators=(',', ': ')) + "</pre>"
-  """
-  
-  """
-  # get metadata by calling getNodeContent function
-  input = request.args.to_dict(False)
-  resultDOM = search(clientID=input['client'][0], userID=input['user'][0], artist=input['ARTIST'][0])
-  jsonResponse = {}
-  response = resultDOM.getElementsByTagName("RESPONSE")[0]
-  jsonResponse = getNodeContent(response)
-  #return json.dumps(jsonResponse, sort_keys=True, separators=(',', ': '))
-  
-  # render returned metadata into an HTML output, trying to format JSON
-  createHTML(json.dumps(jsonResponse, sort_keys=True, separators=(',', ': ')))
-  return render_template('test.html')
-  """
 
 @app.route("/album_search")
 def albumSearch():
   check_Result = checkInput(request)
   if check_Result[0] == "bad":
     return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
-  else:
-    return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+  
+  input_JSON = check_Result[1]
+  # get metadata by calling getNodeContent function
+  resultDOM = search(clientID=input_JSON['client'], userID=input_JSON['user'], artist=input_JSON['artist'], album=input_JSON['album_title'], track=input_JSON['track_title'])
+  jsonResponse = {}
+  response = resultDOM.getElementsByTagName("RESPONSE")[0]
+  jsonResponse = getNodeContent(response)
+  return "<pre>" + json.dumps(jsonResponse, sort_keys=True, separators=(',', ': ')) + "</pre>"
 
 @app.route("/album_fingerprint")
 def albumFingerprint():
@@ -155,23 +136,35 @@ def albumFingerprint():
   if check_Result[0] == "bad":
     return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
   else:
-    return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
 
 @app.route("/album_toc")
 def albumToc():
   check_Result = checkInput(request)
   if check_Result[0] == "bad":
     return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
-  else:
-    return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+  
+  input_JSON = check_Result[1]
+  # get metadata by calling getNodeContent function
+  resultDOM = search(clientID=input_JSON['client'], userID=input_JSON['user'], toc=input_JSON['toc'])
+  jsonResponse = {}
+  response = resultDOM.getElementsByTagName("RESPONSE")[0]
+  jsonResponse = getNodeContent(response)
+  return "<pre>" + json.dumps(jsonResponse, sort_keys=True, separators=(',', ': ')) + "</pre>"
 
 @app.route("/album_fetch")
 def albumFetch():
   check_Result = checkInput(request)
   if check_Result[0] == "bad":
     return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
-  else:
-    return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+  
+  input_JSON = check_Result[1]
+  # get metadata by calling getNodeContent function
+  resultDOM = fetch(clientID=input_JSON['client'], userID=input_JSON['user'], GNID=input_JSON['gn_id'])
+  jsonResponse = {}
+  response = resultDOM.getElementsByTagName("RESPONSE")[0]
+  jsonResponse = getNodeContent(response)
+  return "<pre>" + json.dumps(jsonResponse, sort_keys=True, separators=(',', ': ')) + "</pre>"
 
 if __name__ == "__main__":
   app.debug = True
