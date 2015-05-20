@@ -54,9 +54,9 @@ def search(clientID='', userID='', artist='', album='', track='', toc=''):
     print 'ClientID and UserID are required'
     return None
 
-  if artist=='' and album=='' and track=='' and toc=='':
-    print 'Must query with at least one field (artist, album, track, toc)'
-    return None
+  #if artist=='' and album=='' and track=='' and toc=='':
+    #print 'Must query with at least one field (artist, album, track, toc)'
+    #return None
   
   # Create XML request
   query = _gnquery()
@@ -73,6 +73,50 @@ def search(clientID='', userID='', artist='', album='', track='', toc=''):
     query.addQueryTextField('ARTIST', artist)
     query.addQueryTextField('ALBUM_TITLE', album)
     query.addQueryTextField('TRACK_TITLE', track)
+  query.addQueryOption('SELECT_EXTENDED', 'COVER,REVIEW,ARTIST_BIOGRAPHY,ARTIST_IMAGE,ARTIST_OET,MOOD,TEMPO')
+  query.addQueryOption('SELECT_DETAIL', 'GENRE:3LEVEL,MOOD:2LEVEL,TEMPO:3LEVEL,ARTIST_ORIGIN:4LEVEL,ARTIST_ERA:2LEVEL,ARTIST_TYPE:2LEVEL')
+  
+  queryXML = query.toString()
+  
+  if DEBUG:
+    print '------------'
+    print 'QUERY XML'
+    print '------------'
+    print queryXML
+  
+  # POST query
+  response = urllib2.urlopen(_gnurl(clientID), queryXML)
+  
+  if DEBUG:
+    response2 = urllib2.urlopen(_gnurl(clientID), queryXML)
+    responseXML = response2.read()
+    print '------------'
+    print 'RESPONSE XML'
+    print '------------'
+    print responseXML
+  
+  return xml.dom.minidom.parse(response)
+
+
+def fetch(clientID='', userID='', GNID=''):
+  """
+  Fetches a track or album by GN ID
+  """
+
+  if clientID=='' or userID=='':
+    print 'ClientID and UserID are required'
+    return None
+
+  #if GNID=='':
+    #print 'GNID is required'
+    #return None
+  
+  # Create XML request
+  query = _gnquery()
+
+  query.addAuth(clientID, userID)
+  query.addQuery('ALBUM_FETCH')
+  query.addQueryGNID(GNID)
   query.addQueryOption('SELECT_EXTENDED', 'COVER,REVIEW,ARTIST_BIOGRAPHY,ARTIST_IMAGE,ARTIST_OET,MOOD,TEMPO')
   query.addQueryOption('SELECT_DETAIL', 'GENRE:3LEVEL,MOOD:2LEVEL,TEMPO:3LEVEL,ARTIST_ORIGIN:4LEVEL,ARTIST_ERA:2LEVEL,ARTIST_TYPE:2LEVEL')
   
