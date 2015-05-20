@@ -43,7 +43,7 @@ def register(clientID):
   return xml.dom.minidom.parse(response)
 
 
-def search(clientID='', userID='', artist='', album='', track='', toc=''):
+def search(clientID='', userID='', artist='', album='', track='', toc='', input_JSON={}):
   """
   Queries the Gracenote service for a track, album, artist, or TOC
   
@@ -63,6 +63,23 @@ def search(clientID='', userID='', artist='', album='', track='', toc=''):
   
   query.addAuth(clientID, userID)
   
+  # new query forming that handles optional input params from user
+  if (toc != ''):
+    query.addQuery('ALBUM_TOC')
+    query.addQueryTOC(toc)
+  else:
+    query.addQuery('ALBUM_SEARCH')
+    query.addQueryTextField('ARTIST', artist)
+    query.addQueryTextField('ALBUM_TITLE', album)
+    query.addQueryTextField('TRACK_TITLE', track)
+  if 'mode' in input_JSON.keys():
+    query.addQueryMode(input_JSON['mode'])
+  for option in ['prefer_xid', 'cover_size', 'fallback_genrecover', 'select_extended', 'select_detail']:
+    if option in input_JSON.keys():
+      query.addQueryOption(option, input_JSON[option])
+  
+  """
+  # original XML query forming
   if (toc != ''):
     query.addQuery('ALBUM_TOC')
     query.addQueryMode('SINGLE_BEST_COVER')
@@ -75,6 +92,7 @@ def search(clientID='', userID='', artist='', album='', track='', toc=''):
     query.addQueryTextField('TRACK_TITLE', track)
   query.addQueryOption('SELECT_EXTENDED', 'COVER,REVIEW,ARTIST_BIOGRAPHY,ARTIST_IMAGE,ARTIST_OET,MOOD,TEMPO')
   query.addQueryOption('SELECT_DETAIL', 'GENRE:3LEVEL,MOOD:2LEVEL,TEMPO:3LEVEL,ARTIST_ORIGIN:4LEVEL,ARTIST_ERA:2LEVEL,ARTIST_TYPE:2LEVEL')
+  """
   
   queryXML = query.toString()
   
