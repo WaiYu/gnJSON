@@ -20,7 +20,7 @@ You can simply copy both gnapi.py and pygn2.py to your local folder, execute pyt
 
 Parameters used in query above: client, user, artist, select_extended, select_detail, range.
 
-For all required, optional parameters, please refer to the Gracenote [WebAPI documentation](https://developer.gracenote.com/web-api).
+For all required/optional parameters, please refer to the Gracenote [WebAPI documentation](https://developer.gracenote.com/web-api).
 
 And the returned metadata is in the format below:
 
