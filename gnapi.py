@@ -90,7 +90,7 @@ def registerUser():
     resultDOM = register(request.args.get('client'))
     response = resultDOM.getElementsByTagName("RESPONSE")[0]
     jsonResponse = getNodeContent(response)
-    return "<pre>" + json.dumps(jsonResponse, sort_keys=True, separators=(',', ': ')) + "</pre>"
+    return "<pre>" + json.dumps(jsonResponse, sort_keys=False, separators=(',', ': ')) + "</pre>"
   else:
     return '<pre>{"RESPONSE":"Input error", "MESSAGE":"Please provide Client ID only"}</pre>'
 
@@ -124,11 +124,11 @@ def albumSearch():
   
   input_JSON = check_Result[1]
   # get metadata by calling getNodeContent function
-  resultDOM = search(clientID=input_JSON['client'], userID=input_JSON['user'], artist=input_JSON['artist'], album=input_JSON['album_title'], track=input_JSON['track_title'])
+  resultDOM = search(clientID=input_JSON['client'], userID=input_JSON['user'], artist=input_JSON['artist'], album=input_JSON['album_title'], track=input_JSON['track_title'], input_JSON=input_JSON)
   jsonResponse = {}
   response = resultDOM.getElementsByTagName("RESPONSE")[0]
   jsonResponse = getNodeContent(response)
-  return "<pre>" + json.dumps(jsonResponse, sort_keys=True, separators=(',', ': ')) + "</pre>"
+  return "<pre>" + json.dumps(jsonResponse, sort_keys=False, separators=(',', ': ')) + "</pre>"
 
 @app.route("/album_fingerprint")
 def albumFingerprint():
@@ -146,11 +146,11 @@ def albumToc():
   
   input_JSON = check_Result[1]
   # get metadata by calling getNodeContent function
-  resultDOM = search(clientID=input_JSON['client'], userID=input_JSON['user'], toc=input_JSON['toc'])
+  resultDOM = search(clientID=input_JSON['client'], userID=input_JSON['user'], toc=input_JSON['toc'], input_JSON=input_JSON)
   jsonResponse = {}
   response = resultDOM.getElementsByTagName("RESPONSE")[0]
   jsonResponse = getNodeContent(response)
-  return "<pre>" + json.dumps(jsonResponse, sort_keys=True, separators=(',', ': ')) + "</pre>"
+  return "<pre>" + json.dumps(jsonResponse, sort_keys=False, separators=(',', ': ')) + "</pre>"
 
 @app.route("/album_fetch")
 def albumFetch():
@@ -164,7 +164,7 @@ def albumFetch():
   jsonResponse = {}
   response = resultDOM.getElementsByTagName("RESPONSE")[0]
   jsonResponse = getNodeContent(response)
-  return "<pre>" + json.dumps(jsonResponse, sort_keys=True, separators=(',', ': ')) + "</pre>"
+  return "<pre>" + json.dumps(jsonResponse, sort_keys=False, separators=(',', ': ')) + "</pre>"
 
 if __name__ == "__main__":
   app.debug = True
