@@ -16,7 +16,7 @@ You can simply copy both gnapi.py and pygn2.py to your local folder, execute pyt
 # Sample Query
 **Album Search API**
 
-http://127.0.0.1:5000/album_search?client=XXXXXXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&user=XXXXXXXXXXXXXXXXXXXXXXXXX&artist=pink%20floyd&select_extended=genre,mood,tempo,artist_oet&select_detail=GENRE:3LEVEL,MOOD:2LEVEL,TEMPO:3LEVEL,ARTIST_ORIGIN:4LEVEL&range=22
+    http://127.0.0.1:5000/album_search?client=XXXXXXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&user=XXXXXXXXXXXXXXXXXXXXXXXXX&artist=pink%20floyd&select_extended=genre,mood,tempo,artist_oet&select_detail=GENRE:3LEVEL,MOOD:2LEVEL,TEMPO:3LEVEL,ARTIST_ORIGIN:4LEVEL&range=22
 
 Parameters: client, user, artist, select_extended, select_detail, range
 
