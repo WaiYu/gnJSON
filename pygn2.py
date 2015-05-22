@@ -63,6 +63,12 @@ def search(clientID='', userID='', artist='', album='', track='', toc='', input_
   
   query.addAuth(clientID, userID)
   
+  if 'lang' in input_JSON.keys():
+    query.addLang(input_JSON['lang'])
+  
+  if 'country' in input_JSON.keys():
+    query.addLang(input_JSON['country'])
+  
   # new query forming that handles optional input params from user
   if (toc != ''):
     query.addQuery('ALBUM_TOC')
@@ -189,6 +195,14 @@ class _gnquery:
   
     client.text = clientID
     user.text = userID
+  
+  def addLang(self, languageCode):
+    language = xml.etree.ElementTree.SubElement(self.root, 'LANG')
+    language.text = languageCode
+  
+  def addCountry(self, countryCode):
+    country = xml.etree.ElementTree.SubElement(self.root, 'COUNTRY')
+    country.text = countryCode
   
   def addQuery(self, cmd):
     query = xml.etree.ElementTree.SubElement(self.root, 'QUERY')
