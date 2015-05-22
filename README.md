@@ -65,7 +65,7 @@ And the returned metadata is in the format below:
             }
           },
           ...(returned album metadata truncated)...
-        }
+        },
         STATUS: "OK",
         RANGE: {
           COUNT: "4949",
