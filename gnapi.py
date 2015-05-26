@@ -160,7 +160,7 @@ def albumFetch():
   
   input_JSON = check_Result[1]
   # get metadata by calling getNodeContent function
-  resultDOM = fetch(clientID=input_JSON['client'], userID=input_JSON['user'], GNID=input_JSON['gn_id'])
+  resultDOM = fetch(clientID=input_JSON['client'], userID=input_JSON['user'], GNID=input_JSON['gn_id'], input_JSON=input_JSON)
   jsonResponse = {}
   response = resultDOM.getElementsByTagName("RESPONSE")[0]
   jsonResponse = getNodeContent(response)
