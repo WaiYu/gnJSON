@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import request, render_template
 import json
-from pygn2 import register, search, fetch, getNodeContent
+from pygn2 import register, search, fingerprint, fetch, getNodeContent
 app = Flask(__name__)
 
 def checkAuth(args):
@@ -43,9 +43,9 @@ def checkRequiredParam(api="", input_JSON={}):
       return ["bad", {"RESPONSE":"Missing query string", "MESSAGE":"Please provide at least one of the three search field - artist, artist title or track title"}]
   
   elif api == "/album_fingerprint":
-    # TODO: develop a way to check required input for fingerprint lookup
-    requiredParam = ['fingerprint']
-    return ["bad", {"RESPONSE":"API under development", "MESSAGE":"This wrapper currently does not support this API call"}]
+    requiredParam = ['fingertprint_algorithm', 'version', 'data']
+    if not set(requiredParam) & set(input_JSON.keys()) == set(requiredParam):
+      return ["bad", {"RESPONSE":"Missing required query information", "MESSAGE":"Please provide all required fields - fingertprint_algorithm, version and data"}]
   
   elif api == "/album_toc":
     requiredParam = ['toc']
@@ -135,8 +135,14 @@ def albumFingerprint():
   check_Result = checkInput(request)
   if check_Result[0] == "bad":
     return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
-  else:
-    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+  
+  input_JSON = check_Result[1]
+  # get metadata by calling getNodeContent function
+  resultDOM = fingerprint(clientID=input_JSON['client'], userID=input_JSON['user'], fingertprint_algorithm=input_JSON['fingertprint_algorithm'], version=input_JSON['version'], data=input_JSON['data'], input_JSON=input_JSON)
+  jsonResponse = {}
+  response = resultDOM.getElementsByTagName("RESPONSE")[0]
+  jsonResponse = getNodeContent(response)
+  return "<pre>" + json.dumps(jsonResponse, sort_keys=False, separators=(',', ': ')) + "</pre>"
 
 @app.route("/album_toc")
 def albumToc():
