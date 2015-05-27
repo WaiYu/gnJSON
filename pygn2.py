@@ -49,14 +49,6 @@ def search(clientID='', userID='', artist='', album='', track='', toc='', input_
   
   TOC is a string of offsets in the format '150 20512 30837 50912 64107 78357 ...' 
   """
-
-  if clientID=='' or userID=='':
-    print 'ClientID and UserID are required'
-    return None
-
-  #if artist=='' and album=='' and track=='' and toc=='':
-    #print 'Must query with at least one field (artist, album, track, toc)'
-    #return None
   
   # Create XML request
   query = _gnquery()
@@ -89,21 +81,57 @@ def search(clientID='', userID='', artist='', album='', track='', toc='', input_
     if option in input_JSON.keys():
       query.addQueryOption(option, input_JSON[option])
   
+  queryXML = query.toString()
+  
+  if DEBUG:
+    print '------------'
+    print 'QUERY XML'
+    print '------------'
+    print queryXML
+  
+  # POST query
+  response = urllib2.urlopen(_gnurl(clientID), queryXML)
+  
+  if DEBUG:
+    response2 = urllib2.urlopen(_gnurl(clientID), queryXML)
+    responseXML = response2.read()
+    print '------------'
+    print 'RESPONSE XML'
+    print '------------'
+    print responseXML
+  
+  return xml.dom.minidom.parse(response)
+
+
+def fingerprint(clientID='', userID='', fingertprint_algorithm='', version='', data='', input_JSON={}):
   """
-  # original XML query forming
-  if (toc != ''):
-    query.addQuery('ALBUM_TOC')
-    query.addQueryMode('SINGLE_BEST_COVER')
-    query.addQueryTOC(toc)
-  else:
-    query.addQuery('ALBUM_SEARCH')
-    query.addQueryMode('SINGLE_BEST_COVER')
-    query.addQueryTextField('ARTIST', artist)
-    query.addQueryTextField('ALBUM_TITLE', album)
-    query.addQueryTextField('TRACK_TITLE', track)
-  query.addQueryOption('SELECT_EXTENDED', 'COVER,REVIEW,ARTIST_BIOGRAPHY,ARTIST_IMAGE,ARTIST_OET,MOOD,TEMPO')
-  query.addQueryOption('SELECT_DETAIL', 'GENRE:3LEVEL,MOOD:2LEVEL,TEMPO:3LEVEL,ARTIST_ORIGIN:4LEVEL,ARTIST_ERA:2LEVEL,ARTIST_TYPE:2LEVEL')
+  Recognize a track using fingerprint query.
   """
+  
+  # Create XML request
+  query = _gnquery()
+
+  query.addAuth(clientID, userID)
+  
+  if 'lang' in input_JSON.keys():
+    query.addLang(input_JSON['lang'])
+  
+  if 'country' in input_JSON.keys():
+    query.addLang(input_JSON['country'])
+  
+  query.addQuery('ALBUM_FINGERPRINT')
+  query.addQueryFingerprint(fingertprint_algorithm, version, data)
+  
+  if 'mode' in input_JSON.keys():
+    query.addQueryMode(input_JSON['mode'])
+  # TODO: find a way to better handle range-start and range-end
+  if 'range' in input_JSON.keys():
+    start = int(input_JSON['range'])
+    end = start + 10
+    query.addQueryRange(start, end)
+  for option in ['cover_size', 'fallback_genrecover', 'select_extended', 'select_detail']:
+    if option in input_JSON.keys():
+      query.addQueryOption(option, input_JSON[option])
   
   queryXML = query.toString()
   
@@ -131,14 +159,6 @@ def fetch(clientID='', userID='', GNID='', input_JSON={}):
   """
   Fetches a track or album by GN ID
   """
-
-  if clientID=='' or userID=='':
-    print 'ClientID and UserID are required'
-    return None
-
-  #if GNID=='':
-    #print 'GNID is required'
-    #return None
   
   # Create XML request
   query = _gnquery()
@@ -161,12 +181,9 @@ def fetch(clientID='', userID='', GNID='', input_JSON={}):
     start = int(input_JSON['range'])
     end = start + 10
     query.addQueryRange(start, end)
-  for option in ['prefer_xid', 'cover_size', 'fallback_genrecover', 'select_extended', 'select_detail']:
+  for option in ['cover_size', 'fallback_genrecover', 'select_extended', 'select_detail']:
     if option in input_JSON.keys():
       query.addQueryOption(option, input_JSON[option])
-  
-  #query.addQueryOption('SELECT_EXTENDED', 'COVER,REVIEW,ARTIST_BIOGRAPHY,ARTIST_IMAGE,ARTIST_OET,MOOD,TEMPO')
-  #query.addQueryOption('SELECT_DETAIL', 'GENRE:3LEVEL,MOOD:2LEVEL,TEMPO:3LEVEL,ARTIST_ORIGIN:4LEVEL,ARTIST_ERA:2LEVEL,ARTIST_TYPE:2LEVEL')
   
   queryXML = query.toString()
   
@@ -237,6 +254,14 @@ class _gnquery:
     text = xml.etree.ElementTree.SubElement(query, 'TEXT')
     text.attrib['TYPE'] = fieldName
     text.text = value
+  
+  def addQueryFingerprint(self, fingertprint_algorithm, version, data):
+    query = self.root.find('QUERY')
+    fingerprint = xml.etree.ElementTree.SubElement(query, 'FINGERPRINT')
+    fingerprint.attrib['ALGORITHM'] = fingertprint_algorithm
+    fingerprint.attrib['VERSION'] = version
+    fingerprintData = xml.etree.ElementTree.SubElement(fingerprint, 'DATA')
+    fingerprintData.text = data
   
   def addQueryOption(self, parameterName, value):
     query = self.root.find('QUERY')
