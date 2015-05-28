@@ -79,7 +79,6 @@ def hello():
 def registerUser():
   auth_Check_Result = checkAuth(request.args)
   if auth_Check_Result[0] == "bad" and "No User ID" in auth_Check_Result[1]["MESSAGE"]:
-    #return request.args.get('client')
     # TODO: potential issue, query will still go through if user is doing a search but forget to change the API/path/end point
     resultDOM = register(request.args.get('client'))
     response = resultDOM.getElementsByTagName("RESPONSE")[0]
