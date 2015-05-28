@@ -30,11 +30,13 @@ Required input: client, user, toc
 **/album_fetch**
 
 Required input: client, user, gn_id
-***Optional parameter*** for album_search, album_toc and album_fetch: lang, country, mode, *range, cover_size, fallback_genrecover, select_extended, select_detail
+***Optional parameter*** for album_search, album_toc and album_fetch:
+
+lang, country, mode, *range, cover_size, fallback_genrecover, select_extended, select_detail
 
 Please refer to the Gracenote [WebAPI documentation](https://developer.gracenote.com/web-api) for values accepted on optional inputs.
 
-***Note:** when using optional **range** parameter, you only specify the starting count of the returned metadata. The interface will form the query to get next 10 matching results starting from the count you provided.
+*Note: when using optional **range** parameter, you only specify the starting count of the returned metadata. The interface will form the query to get next 10 matching results starting from the count you provided.
 
 ## Sample Query
 **Album Search API**
@@ -96,7 +98,6 @@ And the returned metadata is in the format below:
       }
     }
 
-(more samples to come)
 
 ## Credit
 Some core functions applied in this project adapted and modified from [pygn (by cweichen)](https://github.com/cweichen/pygn).
