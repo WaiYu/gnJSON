@@ -31,13 +31,7 @@ def convertInputArgsToJSON(args):
 def checkRequiredParam(api="", input_JSON={}):
   # check if user provide correct input parameters 
   requiredParam = []
-  # FOR DEVELOPMENT USE
-  if api == "/search":
-    requiredParam = ['artist', 'gender', 'fake_third_param']
-    if not set(requiredParam) & set(input_JSON.keys()):
-      return ["bad","You need to provide at least one of the three search text - artist, artist title or track title"]
-    
-  elif api == "/album_search":
+  if api == "/album_search":
     requiredParam = ['artist', 'album_title', 'track_title']
     if not set(requiredParam) & set(input_JSON.keys()):
       return ["bad", {"RESPONSE":"Missing query string", "MESSAGE":"Please provide at least one of the three search field - artist, artist title or track title"}]
@@ -79,7 +73,7 @@ def checkInput(request):
 
 @app.route("/")
 def hello():
-  return "This is the Gracenote WebAPI wrapper"
+  return "This is the Gracenote WebAPI wrapper - a RESTful API interface"
 
 @app.route("/register")
 def registerUser():
@@ -108,14 +102,6 @@ def sample():
     response += message
   return "<pre>" + response + "</pre>"
 
-@app.route("/search")
-def dev():
-  check_Result = checkInput(request)
-  if check_Result[0] == "bad":
-    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
-  else:
-    return "good result<br><pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
-
 @app.route("/album_search")
 def albumSearch():
   check_Result = checkInput(request)
@@ -135,6 +121,9 @@ def albumFingerprint():
   check_Result = checkInput(request)
   if check_Result[0] == "bad":
     return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+  
+  # temporarily disable album fingerprint look up, until this API function verified/tested
+  return '<pre>{"RESPONSE":"Wrapper error", "MESSAGE":"This API is currently under development, please use GNSDK for fingerprint lookup"}</pre>'
   
   input_JSON = check_Result[1]
   # get metadata by calling getNodeContent function
