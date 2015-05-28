@@ -1,8 +1,8 @@
 ## gnJSON
-A RESTful API runs on your local machine that access [Gracenote](http://www.gracenote.com/), return rich music metadata in JSON format.
+A RESTful API interface that runs on your local machine to access [Gracenote](http://www.gracenote.com/), return rich music metadata in JSON format.
 
 ## Summary
-This web application is a RESTful API that wraps around [Gracenote WebAPI](https://developer.gracenote.com/web-api), and retrieve Gracenote music metadata in JSON format. The goal of this project is to support all four API's Gracenote WebAPI provides - Album search, Album fingerpring, Album toc and Album fetch. Generally, you use the same input parameters as provided by the WebAPI.
+This web application is a RESTful API that wraps around [Gracenote WebAPI](https://developer.gracenote.com/web-api), and retrieve Gracenote music metadata in JSON format. The goal of this project is to support all four API's Gracenote WebAPI provides - Album search, Album fingerpring, Album toc and Album fetch. You simply use the same input parameters as you do for the WebAPI.
 
 Currently, the Album fingerprint part is still under development.
 
@@ -75,7 +75,7 @@ And the returned metadata is in the format below:
       }
     }
 
-(under construction...)
+(more samples to come)
 
 ## Credit
 Some core functions applied in this project adapted and modified from [pygn (by cweichen)](https://github.com/cweichen/pygn).
