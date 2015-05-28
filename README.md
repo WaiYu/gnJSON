@@ -30,7 +30,7 @@ Required input: client, user, toc
 **/album_fetch**
 
 Required input: client, user, gn_id
-***Optional parameter*** for album_search, album_toc and album_fetch: *lang*, country, mode, range, cover_size, fallback_genrecover, select_extended, select_detail
+***Optional parameter*** for album_search, album_toc and album_fetch: *lang*, *country, mode, range, cover_size, fallback_genrecover, select_extended, select_detail
 
 Please refer to the Gracenote [WebAPI documentation](https://developer.gracenote.com/web-api) for values accepted on optional inputs.
 
