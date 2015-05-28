@@ -36,6 +36,7 @@ lang, country, mode, *range, cover_size, fallback_genrecover, select_extended, s
 
 Please refer to the Gracenote [WebAPI documentation](https://developer.gracenote.com/web-api) for values accepted on optional inputs.
 
+*Note: when using optional _range_ parameter, you only specify the starting count of the returned metadata. The interface will form the query to get next 10 matching results starting from the count you provided.
 
 ## Sample Query
 **Album Search API**
