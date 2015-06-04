@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import request, render_template
+from flask import request, render_template, jsonify
 import json
 from pygn2 import register, search, fingerprint, fetch, getNodeContent
 app = Flask(__name__)
@@ -73,6 +73,7 @@ def checkInput(request):
 
 @app.route("/")
 def hello():
+  return render_template('index.html')
   return "This is the Gracenote WebAPI wrapper - a RESTful API interface"
 
 @app.route("/register")
@@ -83,9 +84,10 @@ def registerUser():
     resultDOM = register(request.args.get('client'))
     response = resultDOM.getElementsByTagName("RESPONSE")[0]
     jsonResponse = getNodeContent(response)
-    return "<pre>" + json.dumps(jsonResponse, sort_keys=False, separators=(',', ': ')) + "</pre>"
+    return jsonify(jsonResponse)
   else:
-    return '<pre>{"RESPONSE":"Input error", "MESSAGE":"Please provide Client ID only"}</pre>'
+    jsonResponse = {"RESPONSE":"Input error", "MESSAGE":"Please provide Client ID only"}
+    return jsonify(jsonResponse)
 
 @app.route("/index")
 def sample():
@@ -113,7 +115,7 @@ def albumSearch():
   jsonResponse = {}
   response = resultDOM.getElementsByTagName("RESPONSE")[0]
   jsonResponse = getNodeContent(response)
-  return "<pre>" + json.dumps(jsonResponse, sort_keys=False, separators=(',', ': ')) + "</pre>"
+  return jsonify(jsonResponse)
 
 @app.route("/album_fingerprint")
 def albumFingerprint():
@@ -122,7 +124,8 @@ def albumFingerprint():
     return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
   
   # temporarily disable album fingerprint look up, until this API function verified/tested
-  return '<pre>{"RESPONSE":"Wrapper error", "MESSAGE":"This API is currently under development, please use GNSDK for fingerprint lookup"}</pre>'
+  jsonResponse = {"RESPONSE":"Wrapper error", "MESSAGE":"This API is currently under development, please use GNSDK for fingerprint lookup"}
+  return jsonify(jsonResponse)
   
   input_JSON = check_Result[1]
   # get metadata by calling getNodeContent function
@@ -130,7 +133,7 @@ def albumFingerprint():
   jsonResponse = {}
   response = resultDOM.getElementsByTagName("RESPONSE")[0]
   jsonResponse = getNodeContent(response)
-  return "<pre>" + json.dumps(jsonResponse, sort_keys=False, separators=(',', ': ')) + "</pre>"
+  return jsonify(jsonResponse)
 
 @app.route("/album_toc")
 def albumToc():
@@ -144,7 +147,7 @@ def albumToc():
   jsonResponse = {}
   response = resultDOM.getElementsByTagName("RESPONSE")[0]
   jsonResponse = getNodeContent(response)
-  return "<pre>" + json.dumps(jsonResponse, sort_keys=False, separators=(',', ': ')) + "</pre>"
+  return jsonify(jsonResponse)
 
 @app.route("/album_fetch")
 def albumFetch():
@@ -158,7 +161,7 @@ def albumFetch():
   jsonResponse = {}
   response = resultDOM.getElementsByTagName("RESPONSE")[0]
   jsonResponse = getNodeContent(response)
-  return "<pre>" + json.dumps(jsonResponse, sort_keys=False, separators=(',', ': ')) + "</pre>"
+  return jsonify(jsonResponse)
 
 if __name__ == "__main__":
   app.debug = True
