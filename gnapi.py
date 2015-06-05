@@ -94,7 +94,7 @@ def sample():
   # TODO: FOR DEVELOPMENT USE ONLY
   auth_Check_Result = checkAuth(request.args)
   if auth_Check_Result[0] == "bad":
-    return "<pre>" + json.dumps(auth_Check_Result[1], separators=(',', ': ')) + "</pre>"
+    return jsonify(auth_Check_Result[1])
   
   #response = "SEARCH<br>" + str(request.args)
   response = "SEARCH" + "<br>get " + str(request.args.get('client')) + "<br>keys " + str(request.args.keys()) + "<br>lists " + str(request.args.lists()) + "<br>listvalues " + str(request.args.listvalues()) + "<br>to_dict " + str(request.args.to_dict(False)) + "<br>viewitems " + str(request.args.viewitems()) + "<br>viewkeys " + str(request.args.viewkeys())
@@ -107,7 +107,7 @@ def sample():
 def albumSearch():
   check_Result = checkInput(request)
   if check_Result[0] == "bad":
-    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+    return jsonify(check_Result[1])
   
   input_JSON = check_Result[1]
   # get metadata by calling getNodeContent function
@@ -121,7 +121,7 @@ def albumSearch():
 def albumFingerprint():
   check_Result = checkInput(request)
   if check_Result[0] == "bad":
-    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+    return jsonify(check_Result[1])
   
   # temporarily disable album fingerprint look up, until this API function verified/tested
   jsonResponse = {"RESPONSE":"Wrapper error", "MESSAGE":"This API is currently under development, please use GNSDK for fingerprint lookup"}
@@ -139,7 +139,7 @@ def albumFingerprint():
 def albumToc():
   check_Result = checkInput(request)
   if check_Result[0] == "bad":
-    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+    return jsonify(check_Result[1])
   
   input_JSON = check_Result[1]
   # get metadata by calling getNodeContent function
@@ -153,7 +153,7 @@ def albumToc():
 def albumFetch():
   check_Result = checkInput(request)
   if check_Result[0] == "bad":
-    return "<pre>" + json.dumps(check_Result[1], separators=(',', ': ')) + "</pre>"
+    return jsonify(check_Result[1])
   
   input_JSON = check_Result[1]
   # get metadata by calling getNodeContent function
