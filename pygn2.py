@@ -73,9 +73,16 @@ def search(clientID='', userID='', artist='', album='', track='', toc='', input_
   if 'mode' in input_JSON.keys():
     query.addQueryMode(input_JSON['mode'])
   # TODO: find a way to better handle range-start and range-end
-  if 'range' in input_JSON.keys():
-    start = int(input_JSON['range'])
-    end = start + 10
+  if 'range_start' in input_JSON.keys() or 'range_end' in input_JSON.keys():
+    if 'range_start' not in input_JSON.keys():
+      start = ""
+      end = int(input_JSON['range_end'])
+    elif 'range_end' not in input_JSON.keys():
+      start = int(input_JSON['range_start'])
+      end = ""
+    else:
+      start = int(input_JSON['range_start'])
+      end = int(input_JSON['range_end'])
     query.addQueryRange(start, end)
   for option in ['prefer_xid', 'cover_size', 'fallback_genrecover', 'select_extended', 'select_detail']:
     if option in input_JSON.keys():
@@ -125,9 +132,16 @@ def fingerprint(clientID='', userID='', fingertprint_algorithm='', version='', d
   if 'mode' in input_JSON.keys():
     query.addQueryMode(input_JSON['mode'])
   # TODO: find a way to better handle range-start and range-end
-  if 'range' in input_JSON.keys():
-    start = int(input_JSON['range'])
-    end = start + 10
+  if 'range_start' in input_JSON.keys() or 'range_end' in input_JSON.keys():
+    if 'range_start' not in input_JSON.keys():
+      start = ""
+      end = int(input_JSON['range_end'])
+    elif 'range_end' not in input_JSON.keys():
+      start = int(input_JSON['range_start'])
+      end = ""
+    else:
+      start = int(input_JSON['range_start'])
+      end = int(input_JSON['range_end'])
     query.addQueryRange(start, end)
   for option in ['cover_size', 'fallback_genrecover', 'select_extended', 'select_detail']:
     if option in input_JSON.keys():
@@ -177,9 +191,16 @@ def fetch(clientID='', userID='', GNID='', input_JSON={}):
   if 'mode' in input_JSON.keys():
     query.addQueryMode(input_JSON['mode'])
   # TODO: find a way to better handle range-start and range-end
-  if 'range' in input_JSON.keys():
-    start = int(input_JSON['range'])
-    end = start + 10
+  if 'range_start' in input_JSON.keys() or 'range_end' in input_JSON.keys():
+    if 'range_start' not in input_JSON.keys():
+      start = ""
+      end = int(input_JSON['range_end'])
+    elif 'range_end' not in input_JSON.keys():
+      start = int(input_JSON['range_start'])
+      end = ""
+    else:
+      start = int(input_JSON['range_start'])
+      end = int(input_JSON['range_end'])
     query.addQueryRange(start, end)
   for option in ['cover_size', 'fallback_genrecover', 'select_extended', 'select_detail']:
     if option in input_JSON.keys():
